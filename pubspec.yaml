@@ -1,0 +1,44 @@
+name: to_do_list_app
+description: A Flutter To-Do List application with GetX state management.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  # State management & routing
+  get: ^4.6.5
+  # Network
+  dio: ^5.3.2
+  # Local storage
+  shared_preferences: ^2.2.0
+  # Functional programming
+  equatable: ^2.0.5
+  # For JSON serialization
+  json_annotation: ^4.8.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  build_runner: ^2.4.6
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+
+  # Add assets if needed
+  # assets:
+  #  - assets/images/
+
+  # Add fonts if needed
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
