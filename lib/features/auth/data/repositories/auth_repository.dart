@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do_list_app/core/serivces/api_service.dart';
 import 'package:to_do_list_app/features/auth/data/models/auth_model.dart';
-import '../../../../core/models/api_response.dart';
 
 class AuthRepository {
   final ApiService _apiService = Get.find<ApiService>();

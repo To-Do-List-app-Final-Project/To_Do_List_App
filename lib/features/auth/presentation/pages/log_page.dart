@@ -6,6 +6,8 @@ import '../controllers/auth_controller.dart';
 class LoginPage extends StatefulWidget {
   static const routeName = '/login';
 
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -62,11 +64,11 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(height: 20),
-                    Center(
+                    const SizedBox(height: 20),
+                    const Center(
                         child: Icon(Icons.lock,
                             size: 100, color: Color(0xFF26B6A5))),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     Text(
                       'Welcome back',
                       style:
@@ -76,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'Login to continue using Tomorrowly',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -84,14 +86,14 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 48),
+                    const SizedBox(height: 48),
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.grey.shade100,
                         hintText: 'Email',
-                        prefixIcon: Icon(Icons.email_outlined,
+                        prefixIcon: const Icon(Icons.email_outlined,
                             color: Color(0xFF26B6A5)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -100,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       validator: Validators.validateEmail,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscureText,
@@ -108,8 +110,8 @@ class _LoginPageState extends State<LoginPage> {
                         filled: true,
                         fillColor: Colors.grey.shade100,
                         hintText: 'Password',
-                        prefixIcon:
-                            Icon(Icons.lock_outline, color: Color(0xFF26B6A5)),
+                        prefixIcon: const Icon(Icons.lock_outline,
+                            color: Color(0xFF26B6A5)),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscureText
@@ -127,33 +129,33 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       validator: Validators.validatePassword,
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: _authController.isLoading.value
                           ? null
                           : _attemptLogin,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF26B6A5),
+                        backgroundColor: const Color(0xFF26B6A5),
                         foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: _authController.isLoading.value
-                          ? CircularProgressIndicator(color: Colors.white)
-                          : Text('Log in',
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text('Log in',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Don't have an account?"),
+                        const Text("Don't have an account?"),
                         TextButton(
                           onPressed: () => Get.toNamed('/signup'),
-                          child: Text('Sign up',
+                          child: const Text('Sign up',
                               style: TextStyle(
                                   color: Color(0xFF26B6A5),
                                   fontWeight: FontWeight.bold)),

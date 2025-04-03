@@ -1,7 +1,6 @@
 // lib/features/todo/data/repositories/task_repository.dart
 
 import 'package:get/get.dart';
-import 'package:dio/dio.dart';
 import 'package:to_do_list_app/core/serivces/api_service.dart';
 import 'package:to_do_list_app/features/todo/data/models/tasks_model.dart';
 

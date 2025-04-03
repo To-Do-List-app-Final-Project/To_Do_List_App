@@ -11,7 +11,7 @@ class AuthController extends GetxController {
   final Rx<User?> user = Rx<User?>(null);
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
-  final RxBool isLoggedIn = false.obs;
+  final RxBool isLoggedIn = true.obs;
 
   @override
   void onInit() {
