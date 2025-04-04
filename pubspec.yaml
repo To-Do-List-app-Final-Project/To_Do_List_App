@@ -21,6 +21,7 @@ dependencies:
   # For JSON serialization
   json_annotation: ^4.8.1
   intl: ^0.20.2
+  table_calendar: ^3.2.0
 
 dev_dependencies:
   flutter_test:

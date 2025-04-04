@@ -4,7 +4,7 @@ import 'package:to_do_list_app/features/todo/data/models/user_model.dart';
 
 class ProfileRepository {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://your-api-base-url.com/api',
+    baseUrl: 'http://10.0.2.2:8094',
     headers: {
       'Content-Type': 'application/json',
     },

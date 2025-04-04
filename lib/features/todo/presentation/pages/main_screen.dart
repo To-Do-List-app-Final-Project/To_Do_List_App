@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:to_do_list_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:to_do_list_app/features/todo/presentation/controllers/profile_controller.dart';
+import 'package:to_do_list_app/features/todo/presentation/pages/calender_page.dart';
 import 'package:to_do_list_app/features/todo/presentation/pages/home_page.dart';
 import 'package:to_do_list_app/features/todo/presentation/pages/profile_screen.dart';
 import '../widgets/bottom_navbar.dart';
@@ -51,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final pages = [
       const HomePage(),
-      const HomePage(),
+      const CalendarPage(),
       const ProfilePage(),
     ];
 

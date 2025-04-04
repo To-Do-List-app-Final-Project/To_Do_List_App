@@ -88,7 +88,7 @@ class TaskInputController extends GetxController {
         dateTime.year == tomorrow.year) {
       // Tomorrow
       final timeStr = TimeOfDay.fromDateTime(dateTime).format(context);
-      reminderText.value = "Tomorrow, $timeStr";
+      reminderText.value = "$timeStr";
     } else {
       // Other date
       final dateStr = "${dateTime.month}/${dateTime.day}";
@@ -238,7 +238,7 @@ void showTaskInputModal(
               ),
               maxLines: 2,
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -260,7 +260,7 @@ void showTaskInputModal(
                             color: Colors.blue[200]!,
                           ),
                         )),
-                    SizedBox(width: 8),
+                    SizedBox(width: 6),
                     Obx(() => OptionButton(
                           icon: Icons.notifications_none,
                           label: controller.reminderText.value,
