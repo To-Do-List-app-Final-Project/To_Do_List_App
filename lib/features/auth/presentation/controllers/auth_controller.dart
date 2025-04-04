@@ -12,6 +12,7 @@ class AuthController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   final RxBool isLoggedIn = true.obs;
+  final RxString tempAuthToken = ''.obs;
 
   @override
   void onInit() {
@@ -23,7 +24,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Check if user is logged in
+      // Check if user is logged inn
       isLoggedIn.value = await _repository.isLoggedIn();
 
       if (isLoggedIn.value) {
@@ -41,13 +42,12 @@ class AuthController extends GetxController {
       isLoading.value = true;
       error.value = '';
 
-      final authResponse = await _repository.login(email, password);
-
-      user.value = authResponse.user;
+      String authResponse = await _repository.login(email, password);
       isLoggedIn.value = true;
+      tempAuthToken.value = authResponse;
 
       // Navigate to home page or dashboard
-      Get.offAllNamed('/home');
+      Get.offAllNamed('/main');
     } catch (e) {
       error.value = e.toString();
     } finally {

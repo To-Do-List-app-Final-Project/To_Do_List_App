@@ -1,6 +1,7 @@
 // lib/features/todo/data/repositories/category_repository.dart
 
 import 'package:get/get.dart';
+import 'package:to_do_list_app/core/models/api_list_response.dart';
 import 'package:to_do_list_app/core/serivces/api_service.dart';
 import '../models/category_model.dart';
 
@@ -9,10 +10,19 @@ class CategoryRepository {
 
   Future<List<Category>> getCategories() async {
     try {
-      final response = await _apiService.get('/api/categories');
+      final response = await _apiService.get('/app/categories');
 
       final List<dynamic> data = response.data['data'];
-      return data.map((item) => Category.fromJson(item)).toList();
+      final apiResponse = APIListResponse<Category>.fromJson(
+        response.data,
+        (json) => Category.fromJson(json),
+      );
+      if (!apiResponse.isSuccess) {
+        print('Error fetching cars: ${apiResponse.message}');
+        throw Exception(apiResponse.message);
+      }
+      // Return the list of cars
+      return apiResponse.data;
     } catch (e) {
       throw e.toString();
     }
@@ -30,7 +40,7 @@ class CategoryRepository {
   Future<Category> createCategory(Category category) async {
     try {
       final response =
-          await _apiService.post('/api/categories', category.toJson());
+          await _apiService.post('/app/categories', category.toJson());
       return Category.fromJson(response.data['data']);
     } catch (e) {
       throw e.toString();

@@ -1,6 +1,7 @@
 // lib/features/todo/data/repositories/task_repository.dart
 
 import 'package:get/get.dart';
+import 'package:to_do_list_app/core/models/api_list_response.dart';
 import 'package:to_do_list_app/core/serivces/api_service.dart';
 import 'package:to_do_list_app/features/todo/data/models/tasks_model.dart';
 
@@ -20,10 +21,18 @@ class TaskRepository {
       }
 
       final response =
-          await _apiService.get('/api/tasks', queryParameters: queryParams);
+          await _apiService.get('/app/tasks', queryParameters: queryParams);
 
-      final List<dynamic> data = response.data['data'];
-      return data.map((item) => Task.fromJson(item)).toList();
+      final apiResponse = APIListResponse<Task>.fromJson(
+        response.data,
+        (json) => Task.fromJson(json),
+      );
+      if (!apiResponse.isSuccess) {
+        print('Error fetching cars: ${apiResponse.message}');
+        throw Exception(apiResponse.message);
+      }
+      // Return the list of cars
+      return apiResponse.data;
     } catch (e) {
       throw e.toString();
     }
@@ -40,7 +49,7 @@ class TaskRepository {
 
   Future<Task> createTask(Task task) async {
     try {
-      final response = await _apiService.post('/api/tasks', task.toJson());
+      final response = await _apiService.post('/app/tasks', task.toJson());
       return Task.fromJson(response.data['data']);
     } catch (e) {
       throw e.toString();
@@ -50,7 +59,7 @@ class TaskRepository {
   Future<Task> updateTask(Task task) async {
     try {
       final response =
-          await _apiService.put('/api/tasks/${task.id}', task.toJson());
+          await _apiService.put('/app/tasks/${task.id}', task.toJson());
       return Task.fromJson(response.data['data']);
     } catch (e) {
       throw e.toString();
@@ -59,7 +68,7 @@ class TaskRepository {
 
   Future<bool> deleteTask(String id) async {
     try {
-      await _apiService.delete('/api/tasks/$id');
+      await _apiService.delete('/app/tasks/$id');
       return true;
     } catch (e) {
       throw e.toString();
@@ -68,7 +77,7 @@ class TaskRepository {
 
   Future<bool> toggleTaskStatus(String id) async {
     try {
-      await _apiService.put('/api/tasks/$id/toggle', {});
+      await _apiService.put('/app/tasks/$id/toggle', {});
       return true;
     } catch (e) {
       throw e.toString();

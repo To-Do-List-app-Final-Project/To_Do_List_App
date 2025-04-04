@@ -9,7 +9,7 @@ import 'package:to_do_list_app/features/auth/data/models/auth_model.dart';
 class AuthRepository {
   final ApiService _apiService = Get.find<ApiService>();
 
-  Future<AuthResponse> login(String email, String password) async {
+  Future<String> login(String email, String password) async {
     try {
       final loginRequest = LoginRequest(
         email: email,
@@ -26,18 +26,8 @@ class AuthRepository {
 
       // The token is directly returned as a string in the data field
       String token = response.data;
-
-      // Extract user info from token (assuming JWT)
-      // You might need to adjust this based on your actual token structure
-      final user = await _getUserFromToken(token);
-
-      // Create auth response
-      final authResponse = AuthResponse(user: user, token: token);
-
-      // Store auth data
-      await _saveAuthData(authResponse);
-
-      return authResponse;
+      await _saveToken(token);
+      return token;
     } catch (e) {
       throw e.toString();
     }
@@ -113,6 +103,11 @@ class AuthRepository {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', authResponse.token);
     await prefs.setString('user', jsonEncode(authResponse.user.toJson()));
+  }
+
+  Future<void> _saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
   }
 
   Future<void> _clearAuthData() async {

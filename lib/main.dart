@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:to_do_list_app/core/di/dependency_injection.dart';
 import 'package:to_do_list_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:to_do_list_app/features/auth/presentation/pages/log_page.dart';
+import 'package:to_do_list_app/features/todo/presentation/controllers/task_controller.dart';
 import 'package:to_do_list_app/features/todo/presentation/pages/home_page.dart';
 import 'package:to_do_list_app/features/todo/presentation/pages/main_screen.dart';
 
@@ -48,10 +49,12 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final AuthController authController = Get.find<AuthController>();
+  final TaskController taskController = Get.find<TaskController>();
 
   @override
   void initState() {
     super.initState();
+    taskController.fetchTasks();
     _checkAuth();
   }
 
@@ -60,9 +63,9 @@ class _SplashScreenState extends State<SplashScreen> {
         const Duration(seconds: 2)); // Show splash for 2 seconds
 
     if (authController.isLoggedIn.value) {
-      Get.offAllNamed('/main');
-    } else {
       Get.offAllNamed('/login');
+    } else {
+      Get.offAllNamed('/main');
     }
   }
 

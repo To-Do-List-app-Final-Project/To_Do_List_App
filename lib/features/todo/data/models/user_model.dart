@@ -4,13 +4,11 @@ class UserModel {
   final String id;
   final String username;
   final String email;
-  final String token;
 
   const UserModel({
     required this.id,
     required this.username,
     required this.email,
-    this.token = '',
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -21,7 +19,6 @@ class UserModel {
       id: userData['_id']?.toString() ?? '',
       username: userData['username'] ?? '',
       email: userData['email'] ?? '',
-      token: userData['token'] ?? '',
     );
   }
 
@@ -30,7 +27,6 @@ class UserModel {
       '_id': id,
       'username': username,
       'email': email,
-      if (token.isNotEmpty) 'token': token,
     };
   }
 
@@ -38,13 +34,11 @@ class UserModel {
     String? id,
     String? username,
     String? email,
-    String? token,
   }) {
     return UserModel(
       id: id ?? this.id,
       username: username ?? this.username,
       email: email ?? this.email,
-      token: token ?? this.token,
     );
   }
 }

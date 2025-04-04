@@ -1,5 +1,4 @@
 // lib/features/todo/presentation/controllers/category_controller.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../data/models/category_model.dart';
@@ -7,7 +6,6 @@ import '../../data/repositories/category_repository.dart';
 
 class CategoryController extends GetxController {
   final CategoryRepository _repository = CategoryRepository();
-
   // Observable state variables
   final RxList<Category> categories = <Category>[].obs;
   final RxBool isLoading = false.obs;
@@ -23,7 +21,6 @@ class CategoryController extends GetxController {
     try {
       isLoading.value = true;
       error.value = '';
-
       final fetchedCategories = await _repository.getCategories();
       categories.value = fetchedCategories;
     } catch (e) {
@@ -38,10 +35,14 @@ class CategoryController extends GetxController {
       isLoading.value = true;
       error.value = '';
 
+      // Convert Color to HEX string format
+      final String hexColor =
+          '#${color.value.toRadixString(16).padLeft(8, '0').substring(2)}';
+
       final newCategory = Category(
         id: '', // Will be assigned by server
         title: title,
-        color: Category.colorToString(color),
+        color: hexColor, // Now using HEX color format
       );
 
       final createdCategory = await _repository.createCategory(newCategory);
@@ -57,9 +58,7 @@ class CategoryController extends GetxController {
     try {
       isLoading.value = true;
       error.value = '';
-
       final updatedCategory = await _repository.updateCategory(category);
-
       final index = categories.indexWhere((c) => c.id == updatedCategory.id);
       if (index != -1) {
         categories[index] = updatedCategory;
@@ -77,9 +76,7 @@ class CategoryController extends GetxController {
     try {
       isLoading.value = true;
       error.value = '';
-
       final success = await _repository.deleteCategory(id);
-
       if (success) {
         categories.removeWhere((category) => category.id == id);
       }

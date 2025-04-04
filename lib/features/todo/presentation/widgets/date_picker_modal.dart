@@ -9,7 +9,7 @@ class DateSelectionResult {
   final List<DateTime>? multipleDates; // For multiple mode
   final Map<String, dynamic>? repeatConfig; // For repeat mode
   final String displayText;
-  
+
   DateSelectionResult({
     required this.mode,
     this.singleDate,
@@ -25,10 +25,11 @@ void showDatePickerModal(
   required Function(DateSelectionResult) onDateSelected,
   DateTime? initialDate,
   String initialMode = 'normal',
+  String taskTitle = '',
 }) {
   final DateTime now = DateTime.now();
   final DateTime todayMidnight = DateTime(now.year, now.month, now.day);
-  
+
   // State variables for the StatefulBuilder
   String selectedMode = initialMode;
   DateTime selectedDate = initialDate ?? todayMidnight;
@@ -40,11 +41,12 @@ void showDatePickerModal(
     'interval': 1,
     'endDate': null,
   };
-  
-  String buttonText = initialDate != null && !_isSameDay(initialDate, todayMidnight) 
-      ? DateFormat('MMM d').format(initialDate)
-      : 'Today';
-  
+
+  String buttonText =
+      initialDate != null && !_isSameDay(initialDate, todayMidnight)
+          ? DateFormat('MMM d').format(initialDate)
+          : 'Today';
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -60,8 +62,8 @@ void showDatePickerModal(
               selectedMode = mode;
               // Reset any relevant state when changing modes
               if (mode == 'normal') {
-                buttonText = _isSameDay(selectedDate, todayMidnight) 
-                    ? 'Today' 
+                buttonText = _isSameDay(selectedDate, todayMidnight)
+                    ? 'Today'
                     : DateFormat('MMM d').format(selectedDate);
               } else if (mode == 'period') {
                 rangeStartDate = selectedDate;
@@ -75,7 +77,7 @@ void showDatePickerModal(
               }
             });
           }
-          
+
           return Container(
             height: MediaQuery.of(context).size.height * 0.7,
             padding: EdgeInsets.fromLTRB(20, 24, 20, 20),
@@ -89,7 +91,7 @@ void showDatePickerModal(
                     Navigator.pop(context);
                   },
                   child: Text(
-                    'Please enter what to do',
+                    taskTitle,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
@@ -103,7 +105,8 @@ void showDatePickerModal(
                   children: [
                     // Calendar button with current selection
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.blue[100],
                         borderRadius: BorderRadius.circular(8),
@@ -111,7 +114,8 @@ void showDatePickerModal(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.calendar_today, color: Colors.blue[400], size: 18),
+                          Icon(Icons.calendar_today,
+                              color: Colors.blue[400], size: 18),
                           SizedBox(width: 4),
                           Text(
                             buttonText,
@@ -133,10 +137,11 @@ void showDatePickerModal(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(Icons.close, color: Colors.grey[600], size: 20),
+                        child: Icon(Icons.close,
+                            color: Colors.grey[600], size: 20),
                       ),
                     ),
-                    
+
                     // Scrollable options section
                     Expanded(
                       child: SingleChildScrollView(
@@ -145,25 +150,25 @@ void showDatePickerModal(
                           children: [
                             SizedBox(width: 8),
                             _buildOptionPill(
-                              'normal', 
+                              'normal',
                               isSelected: selectedMode == 'normal',
                               onTap: () => selectModeAndUpdateUI('normal'),
                             ),
                             SizedBox(width: 8),
                             _buildOptionPill(
-                              'period', 
+                              'period',
                               isSelected: selectedMode == 'period',
                               onTap: () => selectModeAndUpdateUI('period'),
                             ),
                             SizedBox(width: 8),
                             _buildOptionPill(
-                              'repeat', 
+                              'repeat',
                               isSelected: selectedMode == 'repeat',
                               onTap: () => selectModeAndUpdateUI('repeat'),
                             ),
                             SizedBox(width: 8),
                             _buildOptionPill(
-                              'multiple', 
+                              'multiple',
                               isSelected: selectedMode == 'multiple',
                               onTap: () => selectModeAndUpdateUI('multiple'),
                             ),
@@ -171,22 +176,22 @@ void showDatePickerModal(
                         ),
                       ),
                     ),
-                    
+
                     // Send button
                     SizedBox(width: 8),
                     GestureDetector(
                       onTap: () {
                         DateSelectionResult result;
-                        
+
                         // Build result based on the selected mode
                         switch (selectedMode) {
                           case 'period':
-                            if (rangeStartDate != null && rangeEndDate != null) {
+                            if (rangeStartDate != null &&
+                                rangeEndDate != null) {
                               final range = DateTimeRange(
-                                start: rangeStartDate!, 
-                                end: rangeEndDate!
-                              );
-                              final start = DateFormat('MMM d').format(range.start);
+                                  start: rangeStartDate!, end: rangeEndDate!);
+                              final start =
+                                  DateFormat('MMM d').format(range.start);
                               final end = DateFormat('MMM d').format(range.end);
                               result = DateSelectionResult(
                                 mode: 'period',
@@ -197,42 +202,46 @@ void showDatePickerModal(
                               // Incomplete range selection
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text("Please select both start and end dates"),
+                                  content: Text(
+                                      "Please select both start and end dates"),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
                               return;
                             }
                             break;
-                            
+
                           case 'multiple':
                             if (selectedDates.isNotEmpty) {
                               result = DateSelectionResult(
                                 mode: 'multiple',
                                 multipleDates: selectedDates,
-                                displayText: '${selectedDates.length} day${selectedDates.length > 1 ? 's' : ''}',
+                                displayText:
+                                    '${selectedDates.length} day${selectedDates.length > 1 ? 's' : ''}',
                               );
                             } else {
                               // No dates selected
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text("Please select at least one date"),
+                                  content:
+                                      Text("Please select at least one date"),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
                               return;
                             }
                             break;
-                            
+
                           case 'repeat':
                             result = DateSelectionResult(
                               mode: 'repeat',
                               singleDate: selectedDate,
                               repeatConfig: repeatSettings,
-                              displayText: 'Repeating ${repeatSettings['frequency']}',
+                              displayText:
+                                  'Repeating ${repeatSettings['frequency']}',
                             );
                             break;
-                            
+
                           case 'normal':
                           default:
                             result = DateSelectionResult(
@@ -242,7 +251,7 @@ void showDatePickerModal(
                             );
                             break;
                         }
-                        
+
                         onDateSelected(result);
                         Navigator.pop(context);
                       },
@@ -255,26 +264,27 @@ void showDatePickerModal(
                   ],
                 ),
                 SizedBox(height: 16),
-                
+
                 // Show mode-specific UI
                 if (selectedMode == 'repeat')
                   _buildRepeatOptions(
-                    context, 
+                    context,
                     repeatSettings,
                     (newSettings) {
                       setState(() {
                         repeatSettings = newSettings;
-                        
+
                         // Update button text based on frequency
                         String frequency = repeatSettings['frequency'];
-                        buttonText = 'Repeat ${frequency.substring(0, 1).toUpperCase()}${frequency.substring(1)}';
+                        buttonText =
+                            'Repeat ${frequency.substring(0, 1).toUpperCase()}${frequency.substring(1)}';
                       });
                     },
                   )
                 else
                   Expanded(
                     child: _buildCalendar(
-                      context, 
+                      context,
                       selectedDate,
                       todayMidnight,
                       selectedMode,
@@ -286,21 +296,22 @@ void showDatePickerModal(
                         if (newDate.isBefore(todayMidnight)) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text("You can't select dates before today"),
+                              content:
+                                  Text("You can't select dates before today"),
                               behavior: SnackBarBehavior.floating,
                               duration: Duration(seconds: 2),
                             ),
                           );
                           return;
                         }
-                        
+
                         // Handle selection based on mode
                         switch (selectedMode) {
                           case 'normal':
                             setState(() {
                               selectedDate = newDate;
-                              buttonText = _isSameDay(newDate, todayMidnight) 
-                                  ? 'Today' 
+                              buttonText = _isSameDay(newDate, todayMidnight)
+                                  ? 'Today'
                                   : DateFormat('MMM d').format(newDate);
                             });
                             // Close the modal for normal mode
@@ -311,15 +322,17 @@ void showDatePickerModal(
                             ));
                             Navigator.pop(context);
                             break;
-                            
+
                           case 'period':
-                            if (rangeStartDate == null || 
-                                (rangeStartDate != null && rangeEndDate != null)) {
+                            if (rangeStartDate == null ||
+                                (rangeStartDate != null &&
+                                    rangeEndDate != null)) {
                               // Start a new range
                               setState(() {
                                 rangeStartDate = newDate;
                                 rangeEndDate = null;
-                                buttonText = 'From ${DateFormat('MMM d').format(newDate)}';
+                                buttonText =
+                                    'From ${DateFormat('MMM d').format(newDate)}';
                               });
                             } else {
                               // Complete the range
@@ -332,15 +345,17 @@ void showDatePickerModal(
                                 start = rangeStartDate!;
                                 end = newDate;
                               }
-                              
-                              final startText = DateFormat('MMM d').format(start);
+
+                              final startText =
+                                  DateFormat('MMM d').format(start);
                               final endText = DateFormat('MMM d').format(end);
                               final displayText = '$startText - $endText';
-                              
+
                               // Close the picker and return the result
                               final result = DateSelectionResult(
                                 mode: 'period',
-                                dateRange: DateTimeRange(start: start, end: end),
+                                dateRange:
+                                    DateTimeRange(start: start, end: end),
                                 displayText: displayText,
                               );
                               onDateSelected(result);
@@ -348,25 +363,29 @@ void showDatePickerModal(
                               return; // Exit the function early
                             }
                             break;
-                            
+
                           case 'multiple':
                             setState(() {
-                              if (selectedDates.any((date) => _isSameDay(date, newDate))) {
+                              if (selectedDates
+                                  .any((date) => _isSameDay(date, newDate))) {
                                 // Remove date if already selected
-                                selectedDates.removeWhere((date) => _isSameDay(date, newDate));
+                                selectedDates.removeWhere(
+                                    (date) => _isSameDay(date, newDate));
                               } else {
                                 // Add date
                                 selectedDates.add(newDate);
                               }
-                              
-                              buttonText = '${selectedDates.length} day${selectedDates.length > 1 ? 's' : ''}';
+
+                              buttonText =
+                                  '${selectedDates.length} day${selectedDates.length > 1 ? 's' : ''}';
                             });
                             break;
-                            
+
                           case 'repeat':
                             setState(() {
                               selectedDate = newDate;
-                              buttonText = 'Repeat from ${DateFormat('MMM d').format(newDate)}';
+                              buttonText =
+                                  'Repeat from ${DateFormat('MMM d').format(newDate)}';
                             });
                             // No auto-close for repeat mode as we need to set up repeat options
                             break;
@@ -408,7 +427,7 @@ Widget _buildOptionPill(
 }
 
 Widget _buildRepeatOptions(
-  BuildContext context, 
+  BuildContext context,
   Map<String, dynamic> settings,
   Function(Map<String, dynamic>) onSettingsChanged,
 ) {
@@ -429,7 +448,7 @@ Widget _buildRepeatOptions(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildFrequencyOption(
-              'Daily', 
+              'Daily',
               isSelected: settings['frequency'] == 'daily',
               onTap: () {
                 final newSettings = Map<String, dynamic>.from(settings);
@@ -438,7 +457,7 @@ Widget _buildRepeatOptions(
               },
             ),
             _buildFrequencyOption(
-              'Weekly', 
+              'Weekly',
               isSelected: settings['frequency'] == 'weekly',
               onTap: () {
                 final newSettings = Map<String, dynamic>.from(settings);
@@ -447,7 +466,7 @@ Widget _buildRepeatOptions(
               },
             ),
             _buildFrequencyOption(
-              'Monthly', 
+              'Monthly',
               isSelected: settings['frequency'] == 'monthly',
               onTap: () {
                 final newSettings = Map<String, dynamic>.from(settings);
@@ -456,7 +475,7 @@ Widget _buildRepeatOptions(
               },
             ),
             _buildFrequencyOption(
-              'Yearly', 
+              'Yearly',
               isSelected: settings['frequency'] == 'yearly',
               onTap: () {
                 final newSettings = Map<String, dynamic>.from(settings);
@@ -523,9 +542,8 @@ Widget _buildFrequencyOption(
       decoration: BoxDecoration(
         color: isSelected ? Colors.blue[100] : Colors.grey[200],
         borderRadius: BorderRadius.circular(8),
-        border: isSelected 
-            ? Border.all(color: Colors.blue[400]!, width: 2)
-            : null,
+        border:
+            isSelected ? Border.all(color: Colors.blue[400]!, width: 2) : null,
       ),
       child: Text(
         text,
@@ -539,8 +557,8 @@ Widget _buildFrequencyOption(
 }
 
 Widget _buildCalendar(
-  BuildContext context, 
-  DateTime selectedDate, 
+  BuildContext context,
+  DateTime selectedDate,
   DateTime todayDate,
   String mode,
   List<DateTime> multipleDates,
@@ -549,46 +567,44 @@ Widget _buildCalendar(
   Function(DateTime) onDateSelected,
 ) {
   final now = DateTime.now();
-  
+
   // Generate month name and year
   final monthYear = DateFormat('MMMM yyyy').format(selectedDate);
-  
+
   // Create weekday headers
   final weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-  
+
   // Get the year and month of the selected date for the calendar
   final calendarYear = selectedDate.year;
   final calendarMonth = selectedDate.month;
-  
+
   // Calculate days in month
   final daysInMonth = DateTime(calendarYear, calendarMonth + 1, 0).day;
-  
+
   // Calculate first day of month offset
   final firstDayOfMonth = DateTime(calendarYear, calendarMonth, 1);
   final firstDayOffset = firstDayOfMonth.weekday % 7;
-  
+
   // Create calendar grid items
   List<Widget> calendarItems = [];
-  
+
   // Add month name and year controls
-  calendarItems.add(
-    Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            monthYear,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+  calendarItems.add(Padding(
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          monthYear,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
-    )
-  );
-  
+        ),
+      ],
+    ),
+  ));
+
   // Add weekday headers
   List<Widget> weekdayHeaders = [];
   for (final day in weekDays) {
@@ -606,44 +622,43 @@ Widget _buildCalendar(
       ),
     );
   }
-  calendarItems.add(
-    Row(children: weekdayHeaders)
-  );
-  
+  calendarItems.add(Row(children: weekdayHeaders));
+
   // Add blank spaces for offset
   List<Widget> rowItems = [];
   for (int i = 0; i < firstDayOffset; i++) {
     rowItems.add(Expanded(child: SizedBox()));
   }
-  
+
   // Add days of month
   for (int day = 1; day <= daysInMonth; day++) {
     final currentDate = DateTime(calendarYear, calendarMonth, day);
     final isToday = _isSameDay(currentDate, todayDate);
     final isPastDate = currentDate.isBefore(todayDate);
-    
+
     // Check if this date is selected based on the mode
     bool isSelected = false;
     bool isInRange = false;
     Color? backgroundColor;
-    
+
     switch (mode) {
       case 'normal':
         isSelected = _isSameDay(currentDate, selectedDate);
-        backgroundColor = isSelected 
-            ? Colors.blue[300] 
+        backgroundColor = isSelected
+            ? Colors.blue[300]
             : (isToday ? Colors.blue[50] : Colors.transparent);
         break;
-      
+
       case 'period':
-        isSelected = rangeStartDate != null && _isSameDay(currentDate, rangeStartDate) ||
-                    rangeEndDate != null && _isSameDay(currentDate, rangeEndDate);
-                    
+        isSelected =
+            rangeStartDate != null && _isSameDay(currentDate, rangeStartDate) ||
+                rangeEndDate != null && _isSameDay(currentDate, rangeEndDate);
+
         if (rangeStartDate != null && rangeEndDate != null) {
           // Determine if this date is in the selected range
-          isInRange = (currentDate.isAfter(rangeStartDate!) && 
-                      currentDate.isBefore(rangeEndDate!));
-                      
+          isInRange = (currentDate.isAfter(rangeStartDate!) &&
+              currentDate.isBefore(rangeEndDate!));
+
           if (isSelected) {
             backgroundColor = Colors.blue[300]; // Range endpoints
           } else if (isInRange) {
@@ -651,28 +666,29 @@ Widget _buildCalendar(
           } else {
             backgroundColor = isToday ? Colors.blue[50] : Colors.transparent;
           }
-        } else if (rangeStartDate != null && _isSameDay(currentDate, rangeStartDate!)) {
+        } else if (rangeStartDate != null &&
+            _isSameDay(currentDate, rangeStartDate!)) {
           backgroundColor = Colors.blue[300]; // Just the start date
         } else {
           backgroundColor = isToday ? Colors.blue[50] : Colors.transparent;
         }
         break;
-      
+
       case 'multiple':
         isSelected = multipleDates.any((date) => _isSameDay(date, currentDate));
-        backgroundColor = isSelected 
-            ? Colors.blue[300] 
+        backgroundColor = isSelected
+            ? Colors.blue[300]
             : (isToday ? Colors.blue[50] : Colors.transparent);
         break;
-      
+
       case 'repeat':
         isSelected = _isSameDay(currentDate, selectedDate);
-        backgroundColor = isSelected 
-            ? Colors.blue[300] 
+        backgroundColor = isSelected
+            ? Colors.blue[300]
             : (isToday ? Colors.blue[50] : Colors.transparent);
         break;
     }
-    
+
     rowItems.add(
       Expanded(
         child: GestureDetector(
@@ -682,7 +698,7 @@ Widget _buildCalendar(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: backgroundColor,
-              border: isToday && !isSelected 
+              border: isToday && !isSelected
                   ? Border.all(color: Colors.blue[400]!, width: 1)
                   : null,
             ),
@@ -693,9 +709,11 @@ Widget _buildCalendar(
                   day.toString(),
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.normal,
-                    color: isPastDate 
-                        ? Colors.grey[400]  // Greyed out past dates
+                    fontWeight: isSelected || isToday
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: isPastDate
+                        ? Colors.grey[400] // Greyed out past dates
                         : (isSelected ? Colors.white : Colors.black),
                   ),
                 ),
@@ -705,7 +723,7 @@ Widget _buildCalendar(
         ),
       ),
     );
-    
+
     // Start a new row after Saturday (or when we've filled a row)
     if ((firstDayOffset + day) % 7 == 0 || day == daysInMonth) {
       if (day == daysInMonth && (firstDayOffset + day) % 7 != 0) {
@@ -715,17 +733,15 @@ Widget _buildCalendar(
           rowItems.add(Expanded(child: SizedBox()));
         }
       }
-      
-      calendarItems.add(
-        Container(
-          height: 40,
-          child: Row(children: [...rowItems]),
-        )
-      );
+
+      calendarItems.add(Container(
+        height: 40,
+        child: Row(children: [...rowItems]),
+      ));
       rowItems = [];
     }
   }
-  
+
   return Column(
     children: calendarItems,
   );

@@ -1,13 +1,15 @@
 // lib/features/profiles/data/repositories/profile_repository.dart
 import 'package:dio/dio.dart';
+import 'package:to_do_list_app/core/models/api_response.dart';
+import 'package:to_do_list_app/core/serivces/api_service.dart';
+import 'package:to_do_list_app/features/todo/data/models/response/user-profile.dart';
 import 'package:to_do_list_app/features/todo/data/models/user_model.dart';
 
 class ProfileRepository {
+  final apiService = new ApiService();
   final Dio _dio = Dio(BaseOptions(
     baseUrl: 'http://10.0.2.2:8094',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: {'Content-Type': 'application/json', 'Authorization': ''},
   ));
 
   // Add auth token to requests
@@ -15,10 +17,12 @@ class ProfileRepository {
     _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
-  Future<UserModel> getUserProfile() async {
+  Future<ApiResponse> getUserProfile() async {
     try {
-      final response = await _dio.get('/users/profile');
-      return UserModel.fromJson(response.data);
+      final response = await apiService.get('/app/users/detail');
+      final profile = ApiResponse<UserProfileResponse>.fromJson(
+          response.data, (json) => UserProfileResponse.fromJson(json));
+      return profile;
     } catch (e) {
       throw Exception('Failed to load profile: $e');
     }

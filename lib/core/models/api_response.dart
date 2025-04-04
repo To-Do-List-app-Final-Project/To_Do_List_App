@@ -23,7 +23,7 @@ class ApiResponse<T> {
   bool get isFwConsroller => _fwConsroller ?? false;
 
   factory ApiResponse.fromJson(
-      Map<String, dynamic> json, T Function(dynamic) fromJsonT) {
+      Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJsonT) {
     return ApiResponse<T>(
       status: json['status'] ?? 0,
       message: json['message'] ?? '',

@@ -7,37 +7,31 @@ import '../models/api_response.dart';
 
 class ApiService extends GetxService {
   final dio.Dio _dio = dio.Dio();
-  final String baseUrl =
-      'http://10.0.2.2:8094'; // Replace with actual API endpoint
+  final String baseUrl = 'http://10.0.2.2:8094';
 
   ApiService() {
+    _initDio();
+  }
+
+  // Initialize Dio with default settings
+  void _initDio() {
     _dio.options.baseUrl = baseUrl;
     _dio.options.connectTimeout = const Duration(milliseconds: 30000);
     _dio.options.receiveTimeout = const Duration(milliseconds: 30000);
+
     _dio.options.headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
+  }
 
-    // Add interceptor for JWT token
-    _dio.interceptors.add(
-      dio.InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final prefs = await SharedPreferences.getInstance();
-          final token = prefs.getString('token');
-          if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          return handler.next(options); // Continue request
-        },
-        onError: (dio.DioException e, handler) {
-          if (e.response?.statusCode == 401) {
-            _clearAuthData();
-          }
-          return handler.next(e); // Pass error down the pipeline
-        },
-      ),
-    );
+  // Set authorization header before each request
+  Future<void> _setAuthHeader() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null && token.isNotEmpty) {
+      _dio.options.headers['Authorization'] = token;
+    }
   }
 
   Future<void> _clearAuthData() async {
@@ -54,9 +48,13 @@ class ApiService extends GetxService {
     required T Function(dynamic) fromJson,
   }) async {
     try {
+      await _setAuthHeader(); // Set auth header before request
       final response = await _dio.get(path, queryParameters: queryParameters);
       return ApiResponse<T>.fromJson(response.data, fromJson);
     } on dio.DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        await _clearAuthData();
+      }
       return _handleErrorWithParsing<T>(e);
     }
   }
@@ -68,9 +66,13 @@ class ApiService extends GetxService {
     required T Function(dynamic) fromJson,
   }) async {
     try {
+      await _setAuthHeader(); // Set auth header before request
       final response = await _dio.post(path, data: data);
       return ApiResponse<T>.fromJson(response.data, fromJson);
     } on dio.DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        await _clearAuthData();
+      }
       return _handleErrorWithParsing<T>(e);
     }
   }
@@ -82,9 +84,13 @@ class ApiService extends GetxService {
     required T Function(dynamic) fromJson,
   }) async {
     try {
+      await _setAuthHeader(); // Set auth header before request
       final response = await _dio.put(path, data: data);
       return ApiResponse<T>.fromJson(response.data, fromJson);
     } on dio.DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        await _clearAuthData();
+      }
       return _handleErrorWithParsing<T>(e);
     }
   }
@@ -96,9 +102,13 @@ class ApiService extends GetxService {
     required T Function(dynamic) fromJson,
   }) async {
     try {
+      await _setAuthHeader(); // Set auth header before request
       final response = await _dio.delete(path, data: data);
       return ApiResponse<T>.fromJson(response.data, fromJson);
     } on dio.DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        await _clearAuthData();
+      }
       return _handleErrorWithParsing<T>(e);
     }
   }
@@ -129,19 +139,23 @@ class ApiService extends GetxService {
   // Legacy methods for backward compatibility
   Future<dio.Response> get(String path,
       {Map<String, dynamic>? queryParameters}) async {
+    await _setAuthHeader(); // Set auth header before request
     return _requestWrapper(
         () => _dio.get(path, queryParameters: queryParameters));
   }
 
   Future<dio.Response> post(String path, dynamic data) async {
+    await _setAuthHeader(); // Set auth header before request
     return _requestWrapper(() => _dio.post(path, data: data));
   }
 
   Future<dio.Response> put(String path, dynamic data) async {
+    await _setAuthHeader(); // Set auth header before request
     return _requestWrapper(() => _dio.put(path, data: data));
   }
 
   Future<dio.Response> delete(String path, {dynamic data}) async {
+    await _setAuthHeader(); // Set auth header before request
     return _requestWrapper(() => _dio.delete(path, data: data));
   }
 
@@ -151,6 +165,9 @@ class ApiService extends GetxService {
     try {
       return await request();
     } on dio.DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        await _clearAuthData();
+      }
       throw _handleError(e);
     }
   }

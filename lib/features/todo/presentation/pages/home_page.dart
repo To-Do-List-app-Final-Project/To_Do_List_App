@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:to_do_list_app/features/todo/data/models/category_model.dart';
+import 'package:to_do_list_app/features/todo/data/models/tasks_model.dart';
+import 'package:to_do_list_app/features/todo/presentation/controllers/category_controller.dart';
+import 'package:to_do_list_app/features/todo/presentation/controllers/task_controller.dart';
 import '../widgets/calendar_header_widget.dart';
 import '../widgets/calendar_days_widget.dart';
 import '../widgets/add_task_modal.dart';
@@ -13,6 +18,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
+  final CategoryController _categoryController = Get.find<CategoryController>();
+  final TaskController _taskController = Get.find<TaskController>();
+  @override
+  void initState() {
+    super.initState();
+    _categoryController.fetchCategories();
+  }
 
   void _onDaySelected(DateTime selectedDay) {
     setState(() {
@@ -21,6 +33,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +52,7 @@ class _HomePageState extends State<HomePage> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  // Task items and containers (unchanged)
+                  // Task items and containers
                   ListTile(
                     title: Text('Unchecked Task'),
                     trailing: Icon(Icons.arrow_forward_ios),
@@ -51,7 +64,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 10),
                   _buildTodayTasksContainer(context),
                   const SizedBox(height: 10),
-                  _buildSomedayTasksContainer(context),
+                  _buildSomedayTasksContainer(context, _taskController.tasks),
                   const SizedBox(height: 20),
                   Center(child: Text('End of list')),
                 ],
@@ -109,7 +122,127 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSomedayTasksContainer(BuildContext context) {
+  Widget _buildTaskCard(dynamic task) {
+    final String title = task['title'] ?? 'Untitled Task';
+    final String description = task['description'] ?? 'No description';
+    final dynamic category = task['categoryId'];
+    final String categoryColor =
+        category != null ? category['color'] ?? '#FFB6B9' : '#FFB6B9';
+    final String categoryTitle = category != null
+        ? category['title'] ?? 'Uncategorized'
+        : 'Uncategorized';
+
+    // Convert hex color to Flutter color
+    Color color;
+    try {
+      color = Color(int.parse(categoryColor.replaceAll('#', '0xFF')));
+    } catch (e) {
+      // Fallback color if parsing fails
+      color = Colors.blue;
+    }
+
+    return Card(
+      margin: EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    categoryTitle,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontSize: 14,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Priority indicator
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _getPriorityColor(task['priority'] ?? 'Medium')
+                        .withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    task['priority'] ?? 'Medium',
+                    style: TextStyle(
+                      color: _getPriorityColor(task['priority'] ?? 'Medium'),
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                // Status indicator
+                Row(
+                  children: [
+                    Icon(Icons.access_time, size: 16, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      task['status'] ?? 'Pending',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSomedayTasksContainer(BuildContext context, List<Task> tasks) {
+    // Filter tasks for future dates (not today)
+    final DateTime today = DateTime.now();
+    final List<Task> futureTasks = tasks.where((task) {
+      final taskDate = DateTime.parse(task.scheduleDate);
+      return !_isSameDay(taskDate, today);
+    }).toList();
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -118,23 +251,118 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Someday',
+          Text('',
               style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 16)),
           const SizedBox(height: 10),
-          ListTile(
-            title: Text(
-                'Go to the post-office to pickup Goods which was sent months ago'),
-            trailing: Icon(Icons.bookmark_border),
-          ),
+          if (futureTasks.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text('No upcoming tasks',
+                  style: TextStyle(color: Colors.grey)),
+            )
+          else
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: 300,
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: futureTasks.length,
+                itemBuilder: (context, index) =>
+                    _buildTaskItem(futureTasks[index]),
+              ),
+            ),
           const SizedBox(height: 10),
           _buildAddTaskButton(context),
         ],
       ),
     );
+  }
+
+// Update the task item builder to work with Task objects
+  Widget _buildTaskItem(Task task) {
+    // Access properties directly from the Task object
+    final String title = task.title ?? 'Untitled Task';
+    final String description = task.description ?? '';
+    final dynamic category = task.categoryId;
+
+    // Handle category color
+    String categoryColor = '#FFB6B9';
+
+    // Convert hex color to Flutter color
+    Color color;
+    try {
+      color = Color(int.parse(categoryColor.replaceAll('#', '0xFF')));
+    } catch (e) {
+      // Fallback color if parsing fails
+      color = Colors.blue;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: ListTile(
+        title: Text(title),
+        subtitle: Text(description),
+        leading: Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: _getPriorityColor(task.priority ?? 'Medium')
+                    .withOpacity(0.2),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                task.priority ?? 'Medium',
+                style: TextStyle(
+                  color: _getPriorityColor(task.priority ?? 'Medium'),
+                  fontSize: 12,
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(Icons.more_vert),
+          ],
+        ),
+        onTap: () {
+          // Handle task tap
+        },
+      ),
+    );
+  }
+
+// Helper method to determine priority color
+  Color _getPriorityColor(String priority) {
+    switch (priority) {
+      case 'High':
+        return Colors.red;
+      case 'Medium':
+        return Colors.orange;
+      case 'Low':
+        return Colors.green;
+      default:
+        return Colors.blue;
+    }
+  }
+
+// Helper method to check if two dates are the same day
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   Widget _buildAddTaskButton(BuildContext context) {

@@ -1,5 +1,3 @@
-// lib/features/todo/presentation/controllers/task_controller.dart
-
 import 'package:get/get.dart';
 import 'package:to_do_list_app/features/todo/data/models/tasks_model.dart';
 import '../../data/repositories/task_repository.dart';
@@ -44,12 +42,12 @@ class TaskController extends GetxController {
             ? selectedCategoryId.value
             : null,
       );
+      final existingTaskIds = tasks.map((task) => task.id).toSet();
 
-      if (newTasks.isEmpty) {
-        hasMoreData.value = false;
-      } else {
-        tasks.addAll(newTasks);
-        currentPage.value++;
+      for (final task in newTasks) {
+        if (!existingTaskIds.contains(task.id)) {
+          tasks.add(task);
+        }
       }
     } catch (e) {
       error.value = e.toString();
@@ -67,19 +65,30 @@ class TaskController extends GetxController {
     await refreshTasks();
   }
 
-  Future<void> createTask(
-      String title, String description, String categoryId) async {
+  Future<void> createTask({
+    required String title,
+    required String description,
+    required String priority,
+    required String categoryId,
+    required String scheduleDate,
+    DateTime? reminderDate,
+    required String status,
+    required String repeat,
+  }) async {
     try {
       isLoading.value = true;
       error.value = '';
 
       final newTask = Task(
-        id: '', // Will be assigned by server
         title: title,
         description: description,
-        isCompleted: false,
+        priority: priority,
         categoryId: categoryId,
-        createdAt: DateTime.now(),
+        scheduleDate: scheduleDate,
+        reminderDate: reminderDate,
+        status: status,
+        repeat: repeat,
+        isCompleted: false,
       );
 
       final createdTask = await _repository.createTask(newTask);

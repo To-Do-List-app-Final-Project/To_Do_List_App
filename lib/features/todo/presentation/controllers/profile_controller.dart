@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:to_do_list_app/features/todo/data/models/user_model.dart';
+import 'package:to_do_list_app/features/todo/presentation/pages/category_page.dart';
 import '../../data/repositories/profile_repository.dart';
 
 class ProfileController extends GetxController {
@@ -27,14 +28,13 @@ class ProfileController extends GetxController {
       error.value = '';
 
       final userData = await repository.getUserProfile();
-      user.value = userData;
-
-      // Load stats if user loaded successfully
-      if (userData.id.isNotEmpty) {
-        final stats = await repository.getUserStats(userData.id);
-        taskCount.value = stats['totalTasks'] ?? 0;
-        completedTaskCount.value = stats['completedTasks'] ?? 0;
-      }
+      final user = UserModel.fromJson({
+        'id': userData.data.id,
+        'username': userData.data.username,
+        'email': userData.data.email,
+      });
+      this.user.value = user;
+      error.value = "";
     } catch (e) {
       error.value = e.toString();
     } finally {
@@ -81,6 +81,6 @@ class ProfileController extends GetxController {
   }
 
   void navigateToCategoryScreen() {
-    Get.toNamed('/categories');
+    Get.to(EditCategoryPage());
   }
 }

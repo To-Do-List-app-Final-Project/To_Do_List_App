@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:to_do_list_app/features/todo/data/models/category_model.dart';
+import 'package:to_do_list_app/features/todo/presentation/controllers/category_controller.dart';
 import 'category_option_widget.dart';
 import 'task_input_modal.dart';
 
-final List<Category> mockCategories = [
-  Category(id: '1', title: 'Work', color: '#FF5722'),
-  Category(id: '2', title: 'Personal', color: '#4CAF50'),
-  Category(id: '3', title: 'Shopping', color: '#3F51B5'),
-  Category(id: '4', title: 'Fitness', color: '#E91E63'),
-];
+final CategoryController _categoryController = Get.find<CategoryController>();
+final List<Category> mockCategories = _categoryController.categories;
 
 void showAddTaskModal(BuildContext context) {
   showModalBottomSheet(
@@ -58,7 +56,7 @@ Widget buildCategoryOptions(BuildContext context, List<Category> categories) {
               label: category.title,
               onTap: () {
                 Navigator.pop(context);
-                showTaskInputModal(context, category.title, "1");
+                showTaskInputModal(context, category.title, category.id);
               },
             );
           }).toList(),
