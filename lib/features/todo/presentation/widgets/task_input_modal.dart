@@ -327,6 +327,8 @@ void showTaskInputModal(
                             icon: const Icon(Icons.send, color: Colors.white),
                             onPressed: () async {
                               final success = await controller.createTask();
+                              await controller.taskController
+                                  .fetchTasks(); // Fetch tasks after creation
                               if (success) {
                                 // Close modal on success
                                 Navigator.of(context).pop();

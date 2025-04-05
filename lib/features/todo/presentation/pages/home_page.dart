@@ -20,10 +20,12 @@ class _HomePageState extends State<HomePage> {
   DateTime _focusedDay = DateTime.now();
   final CategoryController _categoryController = Get.find<CategoryController>();
   final TaskController _taskController = Get.find<TaskController>();
+
   @override
   void initState() {
     super.initState();
     _categoryController.fetchCategories();
+    // Tasks are already fetched in TaskController's onInit()
   }
 
   void _onDaySelected(DateTime selectedDay) {
@@ -33,7 +35,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +65,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 10),
                   _buildTodayTasksContainer(context),
                   const SizedBox(height: 10),
-                  _buildSomedayTasksContainer(context, _taskController.tasks),
+                  _buildSomedayTasksContainer(context),
                   const SizedBox(height: 20),
                   Center(child: Text('End of list')),
                 ],
@@ -88,10 +89,35 @@ class _HomePageState extends State<HomePage> {
         children: [
           _buildTaskContainerHeader(),
           const SizedBox(height: 10),
+          Obx(() {
+            final todayTasks = _getTodayTasks();
+            if (todayTasks.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text('No tasks for today',
+                    style: TextStyle(color: Colors.grey)),
+              );
+            }
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: todayTasks.length,
+              itemBuilder: (context, index) =>
+                  _buildTaskItem(todayTasks[index]),
+            );
+          }),
           _buildAddTaskButton(context),
         ],
       ),
     );
+  }
+
+  List<Task> _getTodayTasks() {
+    final DateTime today = DateTime.now();
+    return _taskController.tasks.where((task) {
+      final taskDate = DateTime.parse(task.scheduleDate);
+      return _isSameDay(taskDate, today);
+    }).toList();
   }
 
   Widget _buildTaskContainerHeader() {
@@ -235,14 +261,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSomedayTasksContainer(BuildContext context, List<Task> tasks) {
-    // Filter tasks for future dates (not today)
-    final DateTime today = DateTime.now();
-    final List<Task> futureTasks = tasks.where((task) {
-      final taskDate = DateTime.parse(task.scheduleDate);
-      return !_isSameDay(taskDate, today);
-    }).toList();
-
+  Widget _buildSomedayTasksContainer(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -253,20 +272,23 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('',
+          Text('Upcoming Tasks',
               style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 16)),
           const SizedBox(height: 10),
-          if (futureTasks.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text('No upcoming tasks',
-                  style: TextStyle(color: Colors.grey)),
-            )
-          else
-            ConstrainedBox(
+          Obx(() {
+            // Filter tasks for future dates (not today)
+            final futureTasks = _getFutureTasks();
+            if (futureTasks.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text('No upcoming tasks',
+                    style: TextStyle(color: Colors.grey)),
+              );
+            }
+            return ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight: 300,
               ),
@@ -277,7 +299,8 @@ class _HomePageState extends State<HomePage> {
                 itemBuilder: (context, index) =>
                     _buildTaskItem(futureTasks[index]),
               ),
-            ),
+            );
+          }),
           const SizedBox(height: 10),
           _buildAddTaskButton(context),
         ],
@@ -285,7 +308,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-// Update the task item builder to work with Task objects
+  List<Task> _getFutureTasks() {
+    final DateTime today = DateTime.now();
+    return _taskController.tasks.where((task) {
+      final taskDate = DateTime.parse(task.scheduleDate);
+      return !_isSameDay(taskDate, today);
+    }).toList();
+  }
+
+  // Update the task item builder to work with Task objects
   Widget _buildTaskItem(Task task) {
     // Access properties directly from the Task object
     final String title = task.title ?? 'Untitled Task';
@@ -307,15 +338,35 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: ListTile(
-        title: Text(title),
-        subtitle: Text(description),
-        leading: Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+        title: Text(
+          title,
+          style: TextStyle(
+            decoration: task.isCompleted
+                ? TextDecoration.lineThrough
+                : TextDecoration.none,
           ),
+        ),
+        subtitle: Text(description),
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Checkbox for task completion
+            Checkbox(
+              value: task.isCompleted,
+              onChanged: (value) {
+                // Toggle task completion status
+                _taskController.toggleTaskStatus(task.id);
+              },
+            ),
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -346,7 +397,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-// Helper method to determine priority color
+  // Helper method to determine priority color
   Color _getPriorityColor(String priority) {
     switch (priority) {
       case 'High':
@@ -360,7 +411,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-// Helper method to check if two dates are the same day
+  // Helper method to check if two dates are the same day
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }

@@ -148,7 +148,7 @@ class TaskController extends GetxController {
       tasks[index] = updatedTask;
       tasks.refresh();
 
-      await _repository.toggleTaskStatus(taskId);
+      // await _repository.toggleTaskStatus(taskId);
     } catch (e) {
       // Revert optimistic update in case of error
       refreshTasks();
