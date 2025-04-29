@@ -5,13 +5,20 @@ import 'package:get/get.dart';
 import 'package:to_do_list_app/core/di/dependency_injection.dart';
 import 'package:to_do_list_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:to_do_list_app/features/auth/presentation/pages/log_page.dart';
+import 'package:to_do_list_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:to_do_list_app/features/todo/presentation/controllers/task_controller.dart';
 import 'package:to_do_list_app/features/todo/presentation/pages/home_page.dart';
 import 'package:to_do_list_app/features/todo/presentation/pages/main_screen.dart';
+import 'package:to_do_list_app/core/theme/theme_controller.dart';
+import 'package:to_do_list_app/core/theme/app_themes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DependencyInjection.init();
+
+  // Initialize theme controller
+  Get.put(ThemeController());
+
   runApp(MyApp());
 }
 
@@ -20,23 +27,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Todo List App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: '/',
-      getPages: [
-        GetPage(name: '/', page: () => SplashScreen()),
-        GetPage(name: '/login', page: () => LoginPage()),
-        GetPage(name: '/main', page: () => MainScreen()),
-        GetPage(name: '/home', page: () => HomePage()),
-        // GetPage(name: '/task-detail/:id', page: () => TaskDetailPage()),
-        // GetPage(name: '/edit-category', page: () => EditCategoryPage()),
-      ],
-    );
+    final ThemeController themeController = Get.find<ThemeController>();
+
+    return Obx(() => GetMaterialApp(
+          title: 'Todo List App',
+          theme: AppThemes.lightTheme,
+          darkTheme: AppThemes.darkTheme,
+          themeMode: themeController.themeMode.value,
+          initialRoute: '/login',
+          getPages: [
+            GetPage(name: '/', page: () => SplashScreen()),
+            GetPage(name: '/login', page: () => LoginPage()),
+            GetPage(name: '/signup', page: () => SignupPage()),
+            GetPage(name: '/main', page: () => MainScreen()),
+            GetPage(name: '/home', page: () => HomePage()),
+            // GetPage(name: '/task-detail/:id', page: () => TaskDetailPage()),
+            // GetPage(name: '/edit-category', page: () => EditCategoryPage()),
+          ],
+        ));
   }
 }
 

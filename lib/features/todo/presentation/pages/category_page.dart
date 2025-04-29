@@ -31,7 +31,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -52,7 +52,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                   const Text(
                     'Add Category',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -63,7 +63,8 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                     style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       hintText: 'Category Name',
-                      hintStyle: TextStyle(color: Colors.grey.shade900),
+                      hintStyle: TextStyle(
+                          color: const Color.fromARGB(255, 137, 136, 136)),
                       prefixIcon: Icon(
                         Icons.circle,
                         color: _selectedColor,
@@ -216,7 +217,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: ListView.builder(

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:to_do_list_app/features/todo/data/models/user_model.dart';
 import '../controllers/profile_controller.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
+import 'package:to_do_list_app/core/theme/theme_controller.dart';
 
 class ProfileContent extends StatelessWidget {
   final UserModel user;
@@ -18,9 +19,10 @@ class ProfileContent extends StatelessWidget {
     // Get controllers
     final profileController = Get.find<ProfileController>();
     final authController = Get.find<AuthController>();
+    final themeController = Get.find<ThemeController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
@@ -28,13 +30,22 @@ class ProfileContent extends StatelessWidget {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8),
             padding: const EdgeInsets.all(16),
-            decoration: _boxDecoration(),
+            decoration: _boxDecoration(context),
             child: Row(
               children: [
                 CircleAvatar(
                   radius: 32,
                   backgroundImage:
-                      NetworkImage('https://via.placeholder.com/150'),
+                      AssetImage('assets/images/profile_avatar.png'),
+                  onBackgroundImageError: (_, __) {
+                    // Handle image loading error
+                  },
+                  child: Image.asset(
+                    'assets/images/profile_avatar.png',
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.person, size: 32, color: Colors.grey);
+                    },
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -43,26 +54,43 @@ class ProfileContent extends StatelessWidget {
                     children: [
                       Text(
                         user.username,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '@${user.username}',
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         user.email,
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
+                        ),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.grey),
+                  icon: Icon(
+                    Icons.edit,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
+                  ),
                   onPressed: () => profileController.navigateToEditProfile(),
                 ),
               ],
@@ -79,24 +107,27 @@ class ProfileContent extends StatelessWidget {
             return Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
               padding: const EdgeInsets.all(16),
-              decoration: _boxDecoration(),
+              decoration: _boxDecoration(context),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Task Completion',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildStatItem('Total', total.toString()),
-                      _buildStatItem('Completed', completed.toString()),
-                      _buildStatItem('Completion', '$completionPercent%'),
+                      _buildStatItem(context, 'Total', total.toString()),
+                      _buildStatItem(
+                          context, 'Completed', completed.toString()),
+                      _buildStatItem(
+                          context, 'Completion', '$completionPercent%'),
                     ],
                   ),
                 ],
@@ -107,7 +138,7 @@ class ProfileContent extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Settings Section
-          _buildSettingsCard([
+          _buildSettingsCard(context, [
             _buildTile(
               context,
               Icons.category_outlined,
@@ -118,12 +149,14 @@ class ProfileContent extends StatelessWidget {
               context,
               Icons.dark_mode_outlined,
               'Dark Mode',
-              trailing: Switch(
-                value: false,
-                onChanged: (_) {
-                  // Toggle theme
-                },
-              ),
+              trailing: Obx(() => Switch(
+                    value: themeController.isDarkMode,
+                    activeColor: Theme.of(context).colorScheme.primary,
+                    onChanged: (value) {
+                      themeController.changeThemeMode(
+                          value ? ThemeMode.dark : ThemeMode.light);
+                    },
+                  )),
             ),
             _buildTile(
               context,
@@ -136,7 +169,7 @@ class ProfileContent extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Logout Section
-          _buildSettingsCard([
+          _buildSettingsCard(context, [
             _buildTile(
               context,
               Icons.description_outlined,
@@ -159,21 +192,22 @@ class ProfileContent extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildStatItem(BuildContext context, String label, String value) {
     return Column(
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.grey,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             fontSize: 14,
           ),
         ),
@@ -190,17 +224,21 @@ class ProfileContent extends StatelessWidget {
     Color? textColor,
     VoidCallback? onTap,
   }) {
+    final actualIconColor = iconColor ?? Theme.of(context).colorScheme.primary;
+    final actualTextColor =
+        textColor ?? Theme.of(context).colorScheme.onSurface;
+
     return ListTile(
-      leading: Icon(icon, color: iconColor ?? Colors.blue),
+      leading: Icon(icon, color: actualIconColor),
       title: Text(
         title,
-        style: TextStyle(color: textColor ?? Colors.black),
+        style: TextStyle(color: actualTextColor),
       ),
       trailing: trailing ??
-          const Icon(
+          Icon(
             Icons.arrow_forward_ios,
             size: 16,
-            color: Colors.grey,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           ),
       onTap: onTap,
     );
@@ -210,21 +248,34 @@ class ProfileContent extends StatelessWidget {
       BuildContext context, AuthController authController) {
     Get.dialog(
       AlertDialog(
-        title: const Text('Confirm Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(
+          'Confirm Logout',
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        ),
         actions: [
           TextButton(
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
             onPressed: () => Get.back(),
           ),
           TextButton(
-            child: const Text('Logout'),
+            child: Text(
+              'Logout',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
             onPressed: () {
               Get.back();
               authController.logout();
             },
           ),
         ],
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       barrierDismissible: true,
     );
@@ -236,9 +287,9 @@ class ProfileContent extends StatelessWidget {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -246,16 +297,21 @@ class ProfileContent extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Select Language',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
             ...languages.map((lang) => ListTile(
-                  title: Text(lang),
+                  title: Text(
+                    lang,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
+                  ),
                   onTap: () {
                     // Apply language selection
                     Get.back();
@@ -267,25 +323,31 @@ class ProfileContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsCard(List<Widget> tiles) {
+  Widget _buildSettingsCard(BuildContext context, List<Widget> tiles) {
     return Container(
-      decoration: _boxDecoration(),
+      decoration: _boxDecoration(context),
       child: Column(
         children: List.generate(
           tiles.length * 2 - 1,
-          (i) => i.isEven ? tiles[i ~/ 2] : const Divider(height: 1),
+          (i) => i.isEven
+              ? tiles[i ~/ 2]
+              : Divider(
+                  height: 1,
+                  color: Theme.of(context).dividerColor,
+                ),
         ),
       ),
     );
   }
 
-  BoxDecoration _boxDecoration() {
+  BoxDecoration _boxDecoration(BuildContext context) {
     return BoxDecoration(
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.03),
+          color: Theme.of(context).shadowColor.withOpacity(
+              Theme.of(context).brightness == Brightness.light ? 0.03 : 0.1),
           blurRadius: 6,
           offset: const Offset(0, 2),
         ),

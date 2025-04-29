@@ -3,28 +3,32 @@ import 'package:get/get.dart';
 import 'package:to_do_list_app/core/utils/validators.dart';
 import '../controllers/auth_controller.dart';
 
-class LoginPage extends StatefulWidget {
-  static const routeName = '/login';
+class SignupPage extends StatefulWidget {
+  static const routeName = '/signup';
 
-  const LoginPage({super.key});
+  const SignupPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _SignupPageState createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscureText = true;
+  final _confirmPasswordController = TextEditingController();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   // Get the AuthController instance
   final AuthController _authController = Get.find<AuthController>();
 
-  void _attemptLogin() {
+  void _attemptSignup() {
     if (_formKey.currentState!.validate()) {
-      // Use the controller to handle login
-      _authController.login(
+      // Use the controller to handle signup/register
+      _authController.register(
+        _usernameController.text,
         _emailController.text,
         _passwordController.text,
       );
@@ -33,8 +37,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -73,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                     )),
                     const SizedBox(height: 15),
                     Text(
-                      'Welcome back',
+                      'Create Account',
                       style:
                           Theme.of(context).textTheme.headlineMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -83,13 +89,34 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Login to continue using Tomorrowly',
+                      'Sign up to start using Tomorrowly',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: Colors.black54,
                           ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 36),
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        hintText: 'Username',
+                        prefixIcon: const Icon(Icons.person_outline,
+                            color: Color(0xFF26B6A5)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter a username';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -108,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _passwordController,
-                      obscureText: _obscureText,
+                      obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.grey.shade100,
@@ -117,13 +144,13 @@ class _LoginPageState extends State<LoginPage> {
                             color: Color(0xFF26B6A5)),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureText
+                            _obscurePassword
                                 ? Icons.visibility_off
                                 : Icons.visibility,
                             color: Colors.grey,
                           ),
-                          onPressed: () =>
-                              setState(() => _obscureText = !_obscureText),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -132,11 +159,47 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       validator: Validators.validatePassword,
                     ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      obscureText: _obscureConfirmPassword,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        hintText: 'Confirm Password',
+                        prefixIcon: const Icon(Icons.lock_outline,
+                            color: Color(0xFF26B6A5)),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () => setState(() =>
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
+                    ),
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: _authController.isLoading.value
                           ? null
-                          : _attemptLogin,
+                          : _attemptSignup,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF26B6A5),
                         foregroundColor: Colors.white,
@@ -147,7 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: _authController.isLoading.value
                           ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Log in',
+                          : const Text('Sign up',
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
@@ -155,10 +218,10 @@ class _LoginPageState extends State<LoginPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don't have an account?"),
+                        const Text("Already have an account?"),
                         TextButton(
-                          onPressed: () => Get.toNamed('/signup'),
-                          child: const Text('Sign up',
+                          onPressed: () => Get.toNamed('/login'),
+                          child: const Text('Log in',
                               style: TextStyle(
                                   color: Color(0xFF26B6A5),
                                   fontWeight: FontWeight.bold)),

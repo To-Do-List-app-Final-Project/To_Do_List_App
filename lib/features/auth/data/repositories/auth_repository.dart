@@ -1,6 +1,7 @@
 // lib/features/auth/data/repositories/auth_repository.dart
 
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do_list_app/core/serivces/api_service.dart';
@@ -33,8 +34,7 @@ class AuthRepository {
     }
   }
 
-  Future<AuthResponse> register(
-      String username, String email, String password) async {
+  Future<bool> register(String username, String email, String password) async {
     try {
       final registerRequest = RegisterRequest(
         username: username,
@@ -43,26 +43,16 @@ class AuthRepository {
       );
 
       // Get auth token from API
-      final response = await _apiService.getAuthToken(
-          '/api/auth/register', registerRequest.toJson());
+      final response = await _apiService.post(
+          '/app/users/register', registerRequest.toJson());
 
-      if (!response.isSuccess) {
-        throw response.message;
+      if (response.statusCode != 200) {
+        throw response.data['message'] ?? 'Registration failed';
       }
 
       // The token is directly returned as a string in the data field
-      String token = response.data;
-
-      // Extract user info from token (assuming JWT)
-      final user = await _getUserFromToken(token);
-
-      // Create auth response
-      final authResponse = AuthResponse(user: user, token: token);
-
       // Store auth data
-      await _saveAuthData(authResponse);
-
-      return authResponse;
+      return true;
     } catch (e) {
       throw e.toString();
     }
