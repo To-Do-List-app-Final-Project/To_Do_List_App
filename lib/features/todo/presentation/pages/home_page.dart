@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF6F6F6),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildTodayTasksContainer(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(16),
@@ -93,10 +93,9 @@ class _HomePageState extends State<HomePage> {
             final todayTasks = _getTodayTasks();
             if (todayTasks.isEmpty) {
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text('No tasks for today',
-                    style: TextStyle(color: Colors.grey)),
-              );
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text('No tasks for today',
+                      style: Theme.of(context).textTheme.bodySmall));
             }
             return ListView.builder(
               shrinkWrap: true,
@@ -128,10 +127,10 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Today',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16)),
             Text('Sun, 3/23', style: TextStyle(color: Colors.grey)),
           ],
         ),

@@ -60,14 +60,10 @@ class AuthController extends GetxController {
       isLoading.value = true;
       error.value = '';
 
-      final authResponse =
-          await _repository.register(username, email, password);
-
-      user.value = authResponse.user;
-      isLoggedIn.value = true;
+      await _repository.register(username, email, password);
 
       // Navigate to home page or dashboard
-      Get.offAllNamed('/home');
+      Get.offAllNamed('/login');
     } catch (e) {
       error.value = e.toString();
     } finally {
