@@ -38,10 +38,20 @@ class CalendarDaysWidget extends StatelessWidget {
               width: 60,
               margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
               decoration: BoxDecoration(
-                color: isToday ? Colors.blue.shade100 : Colors.white,
+                color: isToday
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                    : isSelected
+                        ? Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withOpacity(0.3)
+                        : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(24),
                 border: isSelected
-                    ? Border.all(color: Colors.grey[400]!, width: 1.5)
+                    ? Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 1.5,
+                      )
                     : null,
               ),
               child: Column(
@@ -52,15 +62,20 @@ class CalendarDaysWidget extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w500,
-                      color: isWeekend ? Colors.red : Colors.black,
+                      color: isWeekend
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     DateFormat('EEE').format(day),
                     style: TextStyle(
-                        fontSize: 13,
-                        color: isWeekend ? Colors.red : Colors.black),
+                      fontSize: 13,
+                      color: isWeekend
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                   const SizedBox(height: 3),
                   Row(
@@ -69,15 +84,19 @@ class CalendarDaysWidget extends StatelessWidget {
                       Container(
                         width: 5,
                         height: 5,
-                        decoration: const BoxDecoration(
-                            color: Colors.redAccent, shape: BoxShape.circle),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.error,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                       const SizedBox(width: 3),
                       Container(
                         width: 5,
                         height: 5,
-                        decoration: const BoxDecoration(
-                            color: Colors.green, shape: BoxShape.circle),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     ],
                   ),

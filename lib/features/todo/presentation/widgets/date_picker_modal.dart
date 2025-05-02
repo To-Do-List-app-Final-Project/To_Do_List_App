@@ -50,7 +50,7 @@ void showDatePickerModal(
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.of(context).colorScheme.surface, // Theme color
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
@@ -95,7 +95,10 @@ void showDatePickerModal(
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black54,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.6),
                     ),
                   ),
                 ),
@@ -108,19 +111,20 @@ void showDatePickerModal(
                       padding:
                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.blue[100],
+                        color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.calendar_today,
-                              color: Colors.blue[400], size: 18),
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 18),
                           SizedBox(width: 4),
                           Text(
                             buttonText,
                             style: TextStyle(
-                              color: Colors.blue[700],
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -134,11 +138,15 @@ void showDatePickerModal(
                       child: Container(
                         padding: EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                          color: Theme.of(context).colorScheme.surfaceVariant,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(Icons.close,
-                            color: Colors.grey[600], size: 20),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.6),
+                            size: 20),
                       ),
                     ),
 
@@ -153,24 +161,28 @@ void showDatePickerModal(
                               'normal',
                               isSelected: selectedMode == 'normal',
                               onTap: () => selectModeAndUpdateUI('normal'),
+                              context: context,
                             ),
                             SizedBox(width: 8),
                             _buildOptionPill(
                               'period',
                               isSelected: selectedMode == 'period',
                               onTap: () => selectModeAndUpdateUI('period'),
+                              context: context,
                             ),
                             SizedBox(width: 8),
                             _buildOptionPill(
                               'repeat',
                               isSelected: selectedMode == 'repeat',
                               onTap: () => selectModeAndUpdateUI('repeat'),
+                              context: context,
                             ),
                             SizedBox(width: 8),
                             _buildOptionPill(
                               'multiple',
                               isSelected: selectedMode == 'multiple',
                               onTap: () => selectModeAndUpdateUI('multiple'),
+                              context: context,
                             ),
                           ],
                         ),
@@ -256,7 +268,7 @@ void showDatePickerModal(
                         Navigator.pop(context);
                       },
                       child: CircleAvatar(
-                        backgroundColor: Colors.blue[300],
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         radius: 24,
                         child: Icon(Icons.send, color: Colors.white),
                       ),
@@ -406,19 +418,24 @@ Widget _buildOptionPill(
   String text, {
   required bool isSelected,
   required VoidCallback onTap,
+  required BuildContext context,
 }) {
   return GestureDetector(
     onTap: onTap,
     child: Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isSelected ? Colors.blue[300] : Colors.grey[200],
+        color: isSelected
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
         text,
         style: TextStyle(
-          color: isSelected ? Colors.white : Colors.grey[700],
+          color: isSelected
+              ? Theme.of(context).colorScheme.onPrimary
+              : Theme.of(context).colorScheme.onSurface,
           fontSize: 14,
         ),
       ),

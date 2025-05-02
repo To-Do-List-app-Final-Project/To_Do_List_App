@@ -18,8 +18,8 @@ class ProfilePage extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Profile'),
-            backgroundColor: const Color(0xFFF6F6F6),
-            foregroundColor: Colors.black,
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
           ),
           body: Center(child: Text('Error: ${controller.error.value}')),
         );
@@ -30,8 +30,8 @@ class ProfilePage extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Profile'),
-            backgroundColor: const Color(0xFFF6F6F6),
-            foregroundColor: Colors.black,
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
           ),
           body: SafeArea(
             child: ProfileContent(user: controller.user.value!),
