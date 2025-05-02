@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                   ListTile(
                     title: Text('Unchecked Task'),
                     trailing: Icon(Icons.arrow_forward_ios),
-                    tileColor: Colors.white,
+                    tileColor: Theme.of(context).colorScheme.surface,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     onTap: () {},
@@ -263,7 +263,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildSomedayTasksContainer(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(16),
@@ -273,7 +273,8 @@ class _HomePageState extends State<HomePage> {
         children: [
           Text('Upcoming Tasks',
               style: TextStyle(
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 16)),
           const SizedBox(height: 10),

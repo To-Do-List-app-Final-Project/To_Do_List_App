@@ -18,7 +18,7 @@ Future<DateTime?> showReminderDialog(
     return await showModalBottomSheet<DateTime>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface, // Theme color
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -42,10 +42,16 @@ Future<DateTime?> showReminderDialog(
                       border: InputBorder.none,
                       hintText: 'Please enter what to do',
                       hintStyle: TextStyle(
-                        color: Colors.grey[600],
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.6),
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
+                      fillColor:
+                          Theme.of(context).inputDecorationTheme.fillColor,
+                      filled: true,
                     ),
                   ),
                   SizedBox(height: 20),
@@ -55,12 +61,16 @@ Future<DateTime?> showReminderDialog(
                     height: 150,
                     child: Stack(
                       children: [
-                        // Selection indicator overlay with gray background
+                        // Selection indicator overlay with theme background
                         Align(
                           alignment: Alignment.center,
                           child: Container(
                             height: 40,
                             decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
@@ -94,7 +104,16 @@ Future<DateTime?> showReminderDialog(
                                       : index == 1
                                           ? "Tomorrow"
                                           : "${getShortDayName(date.weekday)}, ${getMonthName(date.month)} ${date.day}";
-                                  return Center(child: Text(label));
+                                  return Center(
+                                    child: Text(
+                                      label,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                    ),
+                                  );
                                 }),
                               ),
                             ),
@@ -119,16 +138,32 @@ Future<DateTime?> showReminderDialog(
                                   });
                                 },
                                 children: List.generate(
-                                    12,
-                                    (index) =>
-                                        Center(child: Text("${index + 1}"))),
+                                  12,
+                                  (index) => Center(
+                                    child: Text(
+                                      "${index + 1}",
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
 
                             // Colon separator
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 1),
-                              child: Text(":", style: TextStyle(fontSize: 18)),
+                              child: Text(
+                                ":",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
                             ),
 
                             // Minute picker
@@ -147,10 +182,18 @@ Future<DateTime?> showReminderDialog(
                                   });
                                 },
                                 children: List.generate(
-                                    60,
-                                    (index) => Center(
-                                        child: Text(
-                                            index.toString().padLeft(2, '0')))),
+                                  60,
+                                  (index) => Center(
+                                    child: Text(
+                                      index.toString().padLeft(2, '0'),
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
 
@@ -175,8 +218,26 @@ Future<DateTime?> showReminderDialog(
                                   });
                                 },
                                 children: [
-                                  Center(child: Text("AM")),
-                                  Center(child: Text("PM")),
+                                  Center(
+                                    child: Text(
+                                      "AM",
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                  Center(
+                                    child: Text(
+                                      "PM",
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -197,7 +258,7 @@ Future<DateTime?> showReminderDialog(
                             OptionButton(
                               icon: Icons.calendar_today,
                               label: "Today",
-                              color: Colors.blue[200]!,
+                              color: Theme.of(context).colorScheme.primary,
                               onTap: () {
                                 // Get the current text
                                 final currentText = localTextController.text;
@@ -223,7 +284,7 @@ Future<DateTime?> showReminderDialog(
                             OptionButton(
                               icon: Icons.description_outlined,
                               label: "Task",
-                              color: Colors.blue[200]!,
+                              color: Theme.of(context).colorScheme.secondary,
                               onTap: () {
                                 // Get the current text
                                 final currentText = localTextController.text;
@@ -239,7 +300,7 @@ Future<DateTime?> showReminderDialog(
                         ),
                       ),
                       CircleAvatar(
-                        backgroundColor: Colors.blue[300],
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         radius: 24,
                         child: IconButton(
                           icon: Icon(Icons.send, color: Colors.white),

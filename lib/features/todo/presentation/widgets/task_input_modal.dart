@@ -197,7 +197,7 @@ void showTaskInputModal(
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.of(context).colorScheme.surface, // Theme color
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
@@ -218,10 +218,13 @@ void showTaskInputModal(
                 border: InputBorder.none,
                 hintText: 'Please enter what to do',
                 hintStyle: TextStyle(
-                  color: Colors.grey[600],
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
+                fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                filled: true,
               ),
             ),
             TextField(
@@ -230,9 +233,12 @@ void showTaskInputModal(
                 border: InputBorder.none,
                 hintText: 'Add description (optional)',
                 hintStyle: TextStyle(
-                  color: Colors.grey[400],
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   fontSize: 14,
                 ),
+                fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                filled: true,
               ),
               maxLines: 2,
             ),
@@ -260,7 +266,7 @@ void showTaskInputModal(
                               child: OptionButton(
                                 icon: Icons.calendar_today,
                                 label: controller.dateButtonText.value,
-                                color: Colors.blue[200]!,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             )),
                         const SizedBox(width: 6),
@@ -268,16 +274,14 @@ void showTaskInputModal(
                               icon: Icons.notifications_none,
                               label: controller.reminderText.value,
                               color: controller.reminderDateTime.value != null
-                                  ? Colors.blue[200]!
+                                  ? Theme.of(context).colorScheme.secondary
                                   : Colors.transparent,
                               iconSize: 20,
                               onTap: () {
-                                // Pass the current text instead of the controller
                                 final taskTitle =
                                     controller.textController.text;
                                 showReminderDialog(context, taskTitle)
                                     .then((result) {
-                                  // Check if controller is still active before updating
                                   if (Get.isRegistered<TaskInputController>()) {
                                     controller.updateReminderDateTime(
                                         result, context);
@@ -297,12 +301,17 @@ void showTaskInputModal(
                               icon: Icons.flag_outlined,
                               label: controller.priority.value,
                               color: controller.priority.value == 'High'
-                                  ? Colors.red[200]!
+                                  ? Theme.of(context).colorScheme.error
                                   : controller.priority.value == 'Medium'
-                                      ? Colors.orange[200]!
-                                      : Colors.green[200]!,
+                                      ? Theme.of(context)
+                                          .colorScheme
+                                          .secondary
+                                          .withOpacity(0.7)
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.7),
                               onTap: () {
-                                // Cycle through priorities
                                 if (controller.priority.value == 'High') {
                                   controller.priority.value = 'Medium';
                                 } else if (controller.priority.value ==
@@ -321,7 +330,8 @@ void showTaskInputModal(
                   () => controller.isSubmitting.value
                       ? const CircularProgressIndicator()
                       : CircleAvatar(
-                          backgroundColor: Colors.blue[300],
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                           radius: 24,
                           child: IconButton(
                             icon: const Icon(Icons.send, color: Colors.white),
@@ -330,7 +340,6 @@ void showTaskInputModal(
                               await controller.taskController
                                   .fetchTasks(); // Fetch tasks after creation
                               if (success) {
-                                // Close modal on success
                                 Navigator.of(context).pop();
                               }
                             },
@@ -344,7 +353,6 @@ void showTaskInputModal(
       ),
     ),
   ).then((_) {
-    // Dispose of the controller when the modal is closed
     Get.delete<TaskInputController>();
   });
 }

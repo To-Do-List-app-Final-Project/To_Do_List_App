@@ -1,6 +1,8 @@
 // lib/core/theme/app_themes.dart
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:to_do_list_app/core/theme/theme_controller.dart';
 
 class AppThemes {
   // Light theme
@@ -79,7 +81,7 @@ class AppThemes {
 
     // Input decoration theme
     inputDecorationTheme: InputDecorationTheme(
-      fillColor: Colors.grey[100],
+      fillColor: Colors.grey[100], // Light theme
       filled: true,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -169,7 +171,7 @@ class AppThemes {
 
     // Input decoration theme
     inputDecorationTheme: InputDecorationTheme(
-      fillColor: Color(0xFF2A2A2A),
+      fillColor: Color(0xFF2A2A2A), // Dark theme
       filled: true,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -182,4 +184,24 @@ class AppThemes {
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     ),
   );
+}
+
+class ThemeToggleWidget extends StatelessWidget {
+  final ThemeController themeController = Get.find<ThemeController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => IconButton(
+          icon: Icon(
+            themeController.isDarkMode
+                ? Icons.light_mode_rounded
+                : Icons.dark_mode_rounded,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          onPressed: () => themeController.toggleTheme(),
+          tooltip: themeController.isDarkMode
+              ? 'Switch to Light Mode'
+              : 'Switch to Dark Mode',
+        ));
+  }
 }
